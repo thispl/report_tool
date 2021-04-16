@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   
-  <title>Canteen Menu</title>
+  <title>Report Tool</title>
   
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/AdminLTE.min.css')}}">
@@ -21,7 +21,7 @@
       <nav class="navbar navbar-static-top">
         <div class="container">
           <div class="navbar-header">
-            <a href="/" class="navbar-brand"><b>Canteen</b>Menu</a>
+            <a href="/" class="navbar-brand"><b>Report</b>Tool</a>
           </div>
         </div>
       </nav>
@@ -40,44 +40,14 @@
 
         <section class="content">
           <div class="box box-primary">
-            <div class="box-header">
-              <a href="/add">
-              	<center>
-              		<button type="button" class="btn btn-primary btn-flat">
-              			<span class="glyphicon glyphicon-plus"></span> Order
-              		</button>
-              	</center>
-              </a>
-            </div>
-
-            <div class="box-header">
-              <a href="/synctoserver">
-              	<center>
-              		<button type="button" class="btn btn-primary btn-flat">
-              			<span class="glyphicon glyphicon-gear"></span> Sync to Server
-              		</button>
-              	</center>
-              </a>
-            </div>
-            <div class="box-header">
-              <a href="#" id='export'>
-              	<center>
-              		<button type="button" class="btn btn-primary btn-flat">
-              			<span class="glyphicon glyphicon-gear"></span> Export
-              		</button>
-              	</center>
-              </a>
-            </div>
-
             <div class="box-body">
               <table id="dataphone" class="table table-bordered table-striped">
                 <thead align="center">
                   <tr>
                     <th >Employee ID</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Item Name</th>
-                    <th>Price</th>
+                    <th>Punch Time</th>
+                    <th>Log Type</th>
+                    <th>Shift</th>
                   </tr>
                 </thead>
                 
@@ -93,10 +63,9 @@
                   <tr>
                       {% for row in data %}
                     <td>{{ row[0] }}</td>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ row[4] }}</td>
                     <td>{{ row[1] }}</td>
                     <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
                   </tr>
                       {% endfor %}
                     {% endif%}   
@@ -126,11 +95,34 @@
   <script src="{{ url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
   <script src="{{ url_for('static', filename='js/buttons.html5.min.js')}}"></script>
   <script src="{{ url_for('static', filename='js/jszip.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/dataTables.fixedHeader.min.js')}}"></script>
+
 
 
   <script>
     $(document).ready(function() {
-      $('#dataphone').DataTable({
+      // Setup - add a text input to each footer cell
+    $('#dataphone thead tr').clone(true).appendTo( '#dataphone thead' );
+    $('#dataphone thead tr:eq(1) th').each( function (i) {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+ 
+        $( 'input', this ).on( 'keyup change', function () {
+            if ( table.column(i).search() !== this.value ) {
+                table
+                    .column(i)
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+
+
+
+      var table = $('#dataphone').DataTable({
+        lengthMenu : [ 10, 25, 50, 75, 100 ],
+        orderCellsTop: true,
+        fixedHeader: true,
           dom:'Bfrtip',
           buttons: [
           {
